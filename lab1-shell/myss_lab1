@@ -1,0 +1,66 @@
+#!/usr/bin/bash
+:>/home/s182190/lab1_err
+exec 2>> /home/s182190/lab1_err
+IFS=""
+while 
+echo "1. Напечатать имя текущего каталога
+2. Сменить текущий каталог
+3. Выполнить введенную команду
+4. Создать каталог
+5. Удалить каталог вместе с его содержимым
+6. Выйти из программы
+Введите номер пункта меню"
+read command
+do
+    case $command in
+
+        1) path=`/bin/pwd 2>> /home/s182190/lab1_err`
+            if [[ $? == "0" ]]
+            then
+                echo ${path##*/}
+            else
+                echo "Error" >&2
+            fi;;
+        
+        2) echo "Введите имя каталога для перехода"; read name;
+            if [[ "$name" != "/"* ]] 
+            then 
+                name=./$name 
+            fi
+            cd -- "$name" 2>> /home/s182190/lab1_err || echo "Error" >&2;;
+
+        3) echo "Введите команду"; 
+            read name; 
+            eval $name 2>> /home/s182190/lab1_err
+            if [[ $? != 0 ]]
+            then 
+                echo "Error" >&2
+            fi;;
+
+        4) echo "Введите имя создаваемого каталога"; read name;
+            if [[ -e "$name" ]] 
+            then
+                echo "Такой файл уже есть" >> /home/s182190/lab1_err; echo "Error";
+            else 
+                mkdir -- "$name" 2>> /home/s182190/lab1_err || echo "Error" >&2;
+            fi;;
+
+        5) echo "Введите имя удаляемго каталога"; read name
+            if [[ -d "$name" ]] 
+            then 
+                echo "rm: remove $name: (yes/no)?"
+                read sol
+                case $sol in
+                    yes) rm -r -- "$name" 2>> /home/s182190/lab1_err || echo "Error" >&2 ;;
+                    *) : ;;
+                esac
+            else
+                echo "Введённое имя не соответсвует ни одному каталогу" >> /home/s182190/lab1_err; echo "Error" >&2;
+            fi;;
+
+        6) exit 0;;
+
+        *) echo "Неверный пункт меню" >> /home/s182190/lab1_err; echo "Error" >2;;
+
+    esac
+done

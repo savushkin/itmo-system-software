@@ -1,0 +1,5 @@
+#!/usr/bin/bash
+KHUUSAGE="Usage: myss_lab2_1 file_name";
+[[ ! "$#" -eq 1 && -f "$1" ]] && { echo $KHUUSAGE; exit 1; }
+gfind ./ -maxdepth 1 -mindepth 1 -lname "$1" -exec ls -catd1 {} + | cut -d/ -f2
+
